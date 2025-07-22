@@ -190,6 +190,7 @@ class IkfLitModel(LightningModule):
 
         if (self.global_step % self.log_every == 0 and self.global_step > 0) or force_log:
             time_per_batch = time() - t0
+            time_per_batch = max(time_per_batch, 1e-10)
             log_data = {
                 "tr/loss": loss.item(),
                 "tr/time_p_batch": time_per_batch,

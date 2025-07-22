@@ -314,7 +314,7 @@ class IKFlowSolver:
             assert isinstance(n, int)
             assert n > 0
         else:
-            assert y.shape[1] == 7, f"y must be of shape [7] or [n x 7], got {y.shape}"
+            assert y.shape[1] in (7,10), f"y must be shape [7] or [10], got {y.shape}"
 
         assert isinstance(latent_distribution, str)
         assert isinstance(latent_scale, float)
@@ -330,12 +330,22 @@ class IKFlowSolver:
 
         with torch.inference_mode():
             # Get conditional
+            
             if y.numel() == 7:
                 conditional = torch.cat(
                     [y.expand((n, 7)), torch.zeros((n, 1), dtype=DEFAULT_TORCH_DTYPE, device=device)], dim=1
                 )
             else:
                 conditional = torch.cat([y, torch.zeros((n, 1), dtype=DEFAULT_TORCH_DTYPE, device=device)], dim=1)
+            
+
+            # Get conditional (no extra zero column)
+            '''
+            if y.numel() == 7:
+                conditional = y.expand((n, 7))
+            else:
+                conditional = y
+            '''
 
             # Get latent
             if latent is None:

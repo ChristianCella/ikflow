@@ -1,0 +1,40 @@
+Dataset info
+  robot:             ur5e_custom
+  dataset_directory: C:\Users\chris\OneDrive - Politecnico di Milano\Politecnico di Milano\PhD - dottorato\GitHub repositories Lenovo\Robotic_contact_operations\ikflow\ikflow\datasets\ur5e_custom_non-self-colliding
+  training_set_size: 2000000
+  test_set_size:     15000
+
+
+		min,	max,	mean,	std  - for 'samples_tr'
+  col_0:	-6.2788	6.2788	-0.0072	3.6257
+  col_1:	-6.2788	6.2788	-0.0035	3.6241
+  col_2:	-3.1372	3.1372	-0.0024	1.8119
+  col_3:	-6.2788	6.2788	-0.0009	3.6227
+  col_4:	-6.2788	6.2788	0.0007	3.6245
+  col_5:	-6.2788	6.2788	0.0028	3.6258
+
+		min,	max,	mean,	std  - for 'poses_tr'
+  col_0:	-0.9259	0.9244	0.0001	0.3087
+  col_1:	-0.9256	0.9255	-0.0	0.3083
+  col_2:	-0.7538	1.08	0.1623	0.4148
+  col_3:	-0.0016	1.0	0.4204	0.271
+  col_4:	-1.0	1.0	0.0006	0.5
+  col_5:	-0.9999	0.9999	0.0003	0.5
+  col_6:	-0.9999	1.0	0.0005	0.4998
+
+		min,	max,	mean,	std  - for 'samples_te'
+  col_0:	-6.2778	6.2782	0.0165	3.6216
+  col_1:	-6.2784	6.2777	-0.0183	3.6343
+  col_2:	-3.1369	3.1369	0.0229	1.7991
+  col_3:	-6.2778	6.2786	-0.0376	3.6135
+  col_4:	-6.2785	6.2785	-0.0365	3.6416
+  col_5:	-6.2776	6.2786	0.0114	3.6376
+
+		min,	max,	mean,	std  - for 'poses_te'
+  col_0:	-0.9128	0.9197	0.0002	0.3093
+  col_1:	-0.9076	0.9219	0.0001	0.309
+  col_2:	-0.753	1.079	0.1704	0.4161
+  col_3:	-0.0015	0.9994	0.4208	0.2718
+  col_4:	-0.998	0.9986	0.0025	0.5011
+  col_5:	-0.9996	0.9999	0.0004	0.4966
+  col_6:	-0.9986	0.9995	-0.0031	0.5014

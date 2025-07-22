@@ -8,6 +8,7 @@ thirdparty/mdn/mdn/__pycache__/models.cpython-38.pyc
 venv/
 venvTemp/
 venv-test/
+venv_ik
 
 # IDE Config
 .vscode/
