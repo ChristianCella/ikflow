@@ -97,11 +97,24 @@ def main():
     solver._y_transform.std  = y_std
 
     # ─── 6) Load your Lightning checkpoint ────────────────────────────────
+    '''
     ckpt = (
         Path.home() / ".cache" / "ikflow" / "training_logs" /
         "ur5e_custom--Jul.21.2025_08-43AM" /
         "ikflow-checkpoint-epoch-epoch=199.ckpt"
     )
+    '''
+    # 6) load checkpoint from the weights folder in your ikflow clone
+    weights_dir = Path(__file__).resolve().parent.parent  # adjust how many parents you need
+    print("Weights directory:", weights_dir)
+    ckpt = (
+        weights_dir
+        / "ikflow"  # the python package subfolder
+        / "weights"
+        / "ur5e_custom--Jul.22.2025_06-17PM"
+        / "ikflow-checkpoint-epoch-epoch=214.ckpt"
+    )
+
     if not ckpt.exists():
         raise FileNotFoundError(f"{ckpt} not found")
     print("Loading checkpoint:", ckpt.name)

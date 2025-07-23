@@ -49,7 +49,7 @@ LAMBDA                = 1.0
 WEIGHT_DECAY          = 1e-4
 STEP_LR_EVERY         = int(2e6 / BATCH_SIZE)
 GRADIENT_CLIP_VAL     = 1.0
-MAX_EPOCHS            = 200
+MAX_EPOCHS            = 500
 
 # Logging / checkpointing
 VAL_SET_SIZE          = 1000

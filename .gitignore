@@ -26,6 +26,7 @@ training_logs/
 old/
 notes_to_self
 notes
+ikflow/weights/
 
 # Datasets
 datasets/*/
