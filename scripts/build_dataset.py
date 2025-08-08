@@ -1,73 +1,3 @@
-"""
-build_dataset.py — Automatically generate robot joint-angle datasets with example outputs
-
-This script creates training and test datasets of joint configurations and corresponding end-effector poses for a given robot (loaded via URDF). Everything is hard-coded at the top so you can simply run:
-
-    python scripts/build_dataset.py
-
-and you’ll see output like:
-
-    Building dataset for robot: ur5e_custom
-    100%|…| 15000/15000 [...]      # test set sampling
-    100%|…| 2000000/2000000 [...]   # training set sampling
-
-    min, max, mean, std — for 'samples_tr':
-      col_0:  -6.2788, 6.2788, -0.0072, 3.6257  # joint 0
-      …
-      col_5:  -6.2788, 6.2788,  0.0028, 3.6258  # joint 5
-
-    min, max, mean, std — for 'poses_tr':
-      col_0:  -0.9259, 0.9244, 0.0001, 0.3087  # x-coordinate
-      …
-      col_6:  -0.9999, 1.0000, 0.0005, 0.4998  # quaternion z
-
-    (similarly for 'samples_te' and 'poses_te')
-    Saved dataset with 2000000 samples in 43.30 seconds
-    Summary info on all saved datasets:
-      ur5e  ur5e_custom_non-self-colliding  69.0626
-
---- How the dataset is created ---
-1. **Robot instantiation**
-   - Loads `ur5e_custom` from `URDF_PATH` (e.g. `C:\...\ur5e.urdf`).
-   - Reads joint limits such as [-6.283, +6.283] for revolute joints.
-
-2. **Sampling configurations**
-   - **Test set**: draws 15,000 joint-angle vectors uniformly in each limit ±ε,
-   - **Training set**: draws 2,000,000 samples similarly.
-   - With `ONLY_NON_SELF_COLLIDING=True`, any self-colliding pose is discarded and re-sampled until reaching the desired size.
-
-3. **Forward kinematics**
-   - Computes end-effector pose (x,y,z, qw,qx,qy,qz) for each sample.
-
-4. **Tensor conversion & sanity checks**
-   - Converts to `torch.float32` tensors.
-   - Verifies each column has std > 0.001. E.g., joint std ≈3.6257 rad, pose x std ≈0.3087.
-   - Asserts all angles respect joint limits.
-
-5. **File outputs** under `DATASET_DIR/ur5e_custom_non-self-colliding/`:
-   - `samples_tr.pt`, `poses_tr.pt`
-   - `samples_te.pt`, `poses_te.pt`
-   - `info.txt` (human-readable stats)
-
---- Console output explained (with your values) ---
-- **Sampling progress bars**: show completion of 15k and 2M samples.
-- **Statistics blocks**:
-  - For `'samples_tr'`, joint 0 ranged [−6.2788, +6.2788], mean ≈ −0.0072, std ≈ 3.6257.
-  - For `'poses_tr'`, x-coordinate ranged [−0.9259, +0.9244], mean ≈ 0.0001, std ≈ 0.3087.
-  - Similar stats for the test set.
-- **Timing**: You saw 43.30 seconds for 2M samples.
-
-**sum_joint_range = 69.0626** means:
-> Σ over 6 joints of (max − min) ≈ 69.06 rad covered in training set.
-Max possible 6×(2π)≈37.70? Actually each joint ±2π gives 4π span≈12.566, so 6×12.566≈75.4 max; you covered ~69.06 after collision filtering.
-
---- Training vs. Test split ---
-- **Training**: 2 000 000 samples for model fitting (`samples_tr.pt`).
-- **Test**: 15 000 samples for evaluation only (`samples_te.pt`).
-
-This ensures an unbiased performance measure on unseen joint configurations.
-"""
-
 import os, sys
 from typing import List, Optional
 from time import time
@@ -88,12 +18,36 @@ import torch
 base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 print(f"Base directory: {base_dir}")
 sys.path.append(base_dir)
-URDF_PATH = os.path.join(base_dir, "ur5e_utils_mujoco/ur5e.urdf")
+URDF_PATH = os.path.join(base_dir, "ur5e_utils_mujoco/ur5e/ur5e.urdf")
+os.chdir(os.path.dirname(URDF_PATH))  # <-- Add this line
 #URDF_PATH = r"C:\Users\chris\Desktop\Test\ur5e.urdf"
 TRAINING_SET_SIZE = 2_000_000
 TEST_SET_SIZE = 15_000
 ONLY_NON_SELF_COLLIDING = True
 # ===========================
+
+import re
+
+def patch_urdf_mesh_paths(urdf_path: str) -> str:
+    with open(urdf_path, "r") as f:
+        urdf_str = f.read()
+
+    urdf_dir = os.path.dirname(urdf_path)
+
+    def replace_mesh_path(match):
+        mesh_path = match.group(1)
+        full_path = os.path.abspath(os.path.join(urdf_dir, mesh_path))
+        return f'<mesh filename="{full_path}"'
+
+    patched_urdf = re.sub(r'<mesh filename="([^"]+)"', replace_mesh_path, urdf_str)
+
+    patched_path = os.path.join(urdf_dir, "patched_ur5e.urdf")
+    with open(patched_path, "w") as f:
+        f.write(patched_urdf)
+
+    print(f"[INFO] Patched URDF written to: {patched_path}")
+    return patched_path
+
 
 
 def print_saved_datasets_stats(tags: List[str], robots: Optional[List[Robot]] = []):
@@ -222,9 +176,10 @@ def _get_tags(only_non_self_colliding: bool) -> List[str]:
 # === MAIN EXECUTION ===
 if __name__ == "__main__":
     # Prepare robot
+    patched_urdf_path = patch_urdf_mesh_paths(URDF_PATH)
     robot = Robot(
         name="ur5e_custom",
-        urdf_filepath=URDF_PATH,
+        urdf_filepath=patched_urdf_path,
         active_joints=[
             "shoulder_pan_joint",
             "shoulder_lift_joint",

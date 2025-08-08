@@ -22,7 +22,7 @@ def main():
 
     # ─── 1) Instantiate your UR5e ───────────────────────────────────────────
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
-    URDF_PATH = os.path.join(base_dir, "ur5e_utils_mujoco/ur5e.urdf")
+    URDF_PATH = os.path.join(base_dir, "ur5e_utils_mujoco/ur5e/patched_ur5e.urdf")
     robot = Robot(
         name="ur5e_custom",
         urdf_filepath=URDF_PATH,
@@ -111,8 +111,8 @@ def main():
         weights_dir
         / "ikflow"  # the python package subfolder
         / "weights"
-        / "ur5e_custom--Jul.22.2025_06-17PM"
-        / "ikflow-checkpoint-epoch-epoch=214.ckpt"
+        / "ur5e_custom--Aug.07.2025_11-27AM"
+        / "weights-epoch=24.ckpt"
     )
 
     if not ckpt.exists():

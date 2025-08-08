@@ -24,7 +24,7 @@ ROBOT_NAME            = "ur5e_custom"
 base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 print(f"Base directory: {base_dir}")
 sys.path.append(base_dir)
-URDF_PATH = os.path.join(base_dir, "ur5e_utils_mujoco/ur5e.urdf")
+URDF_PATH = os.path.join(base_dir, "ur5e_utils_mujoco/ur5e/patched_ur5e.urdf")
 DISABLE_WANDB         = True
 
 # Model hyperparameters
@@ -49,7 +49,7 @@ LAMBDA                = 1.0
 WEIGHT_DECAY          = 1e-4
 STEP_LR_EVERY         = int(2e6 / BATCH_SIZE)
 GRADIENT_CLIP_VAL     = 1.0
-MAX_EPOCHS            = 500
+MAX_EPOCHS            = 300
 
 # Logging / checkpointing
 VAL_SET_SIZE          = 1000
@@ -145,17 +145,17 @@ model = IkfLitModel(
 ckpt_dir = get_checkpoint_dir(ROBOT_NAME)
 checkpoint_callback = ModelCheckpoint(
     dirpath                 = ckpt_dir,
-    every_n_epochs          = 1,
+    every_n_epochs          = 25,
     save_on_train_epoch_end = True,
     save_top_k              = -1,
-    filename                = "ikflow-checkpoint-epoch-{epoch}",
+    filename                = "weights-{epoch}",
 )
 if not DISABLE_WANDB:
     wandb.config.update({"checkpoint_directory": ckpt_dir})
 
 # --- Trainer ---
 trainer = Trainer(
-    logger                   = wandb_logger,
+    logger                   = False,
     callbacks                = [checkpoint_callback],
     check_val_every_n_epoch  = 1,
     devices                  = [torch.cuda.current_device()] if torch.cuda.is_available() else None,
